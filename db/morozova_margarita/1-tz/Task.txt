@@ -8,14 +8,14 @@
 
 Функционал:
 	Администратор:
-		add owner # Добавить фирму-владельца круиза
+		add/delete/edit owner # Добавить фирму-владельца круиза
 	
 	Фирма-владелец:
-		add cruiseship # Теплоход
-		add cabin # Каюта
-		add move # Расписание движения теплохода
-		add route # Маршрут
-		add price # Цена (за каюту на маршруте)
+		add/delete/edit cruiseship # Теплоход
+		add/delete/edit cabin # Каюта
+		add/delete/edit move # Расписание движения теплохода
+		add/delete/edit route # Маршрут
+		add/delete/edit price # Цена (за каюту на маршруте)
 	
 	Турист:
 		find cruises by: city, dates, routes (маршрут), moves (города на маршруте), prices, cruiseships.
