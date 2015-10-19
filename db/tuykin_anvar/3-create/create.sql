@@ -1,3 +1,8 @@
+CREATE DATABASE university;
+
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS groups;
+
 CREATE TABLE groups (
 	id serial PRIMARY KEY,
 	name VARCHAR NOT NULL,
