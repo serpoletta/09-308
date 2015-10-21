@@ -97,7 +97,7 @@ INSERT INTO routes(
 
 DELETE FROM prices;
 INSERT INTO prices(
-			id, seat_id, route_id, price, booked)
+			id, seat_id, route_id, price, is_booked)
 	VALUES
 	(1, 1, 1, 50200, false),
 	(2, 2, 1, 50200, false),
@@ -106,9 +106,9 @@ INSERT INTO prices(
 	(5, 5, 1, 25200, false
 );
 
-DELETE FROM booked_seats_for_timetable;
-INSERT INTO booked_seats_for_timetable(
-			id, seat_id, ships_timetable_id, booked)
+DELETE FROM book_seats_for_timetable;
+INSERT INTO book_seats_for_timetable(
+			id, seat_id, ships_timetable_id, is_booked)
 	VALUES
 	(1, 1, 1, false),
 	(2, 2, 1, false),
