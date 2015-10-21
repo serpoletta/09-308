@@ -59,7 +59,17 @@ CREATE TABLE cabins
 	id serial primary key,
 	"number" character(5) NOT NULL,
 	"class" character(7) NOT NULL,
+	seats_number integer,
 	cruiseship_id integer references cruiseships(id) ON DELETE CASCADE
+)
+WITH (
+	OIDS=FALSE
+);
+
+CREATE TABLE seats /* Здесь должна быть проверка - соответствует ли количество мест указанному в таблице кают */
+(
+	id serial primary key,
+	cabin_id integer references cabins(id) ON DELETE CASCADE
 )
 WITH (
 	OIDS=FALSE
@@ -70,8 +80,8 @@ CREATE TABLE ships_timetable
 (
 	id serial primary key,
 	cruiseship_id integer NOT NULL references cruiseships(id) ON DELETE CASCADE,
-	"start_date" date NOT NULL,
-	"end_date" date NOT NULL,
+	start_date date NOT NULL,
+	end_date date NOT NULL,
 	start_city_id integer NOT NULL references cities(id) ON DELETE RESTRICT,
 	end_city_id integer NOT NULL references cities(id) ON DELETE RESTRICT
 )
@@ -94,28 +104,29 @@ WITH (
 );
 
 CREATE TABLE prices
-/* Цены на маршруты*/
+/* Цены на места в каютах на маршруты - это для использования пользователями. */
 (
 	id serial primary key,
-	cabin_id integer NOT NULL references cabins(id) ON DELETE CASCADE,
+	seat_id integer NOT NULL references seats(id) ON DELETE CASCADE,
 	route_id integer NOT NULL references routes(id) ON DELETE CASCADE,
 	price integer NULL CONSTRAINT positive_price CHECK(price>0),
 	booked boolean NOT NULL DEFAULT false, /* Здесь при установке true нужно проверять, 
 											чтобы не было пересечения с другим route и прописывать его во всех кусках маршрута*/
-	UNIQUE (cabin_id,route_id)
+	UNIQUE (seat_id,route_id)
 )
 WITH (
 	OIDS=FALSE
 );
 
-CREATE TABLE booked_cabins_for_timetable
-/* Бронирование каюты на каждое перемещение по расписанию: каждая каюта на каждый отрезок пути имеет только 1 бронирование.*/
+CREATE TABLE booked_seats_for_timetable
+/* Бронирование места на каждое перемещение по расписанию: каждое место на каждый отрезок пути имеет только 1 бронирование.*/
+/* Это для того, чтобы не позволить забронировать место дважды - на разных маршрутах, которые перекрывают друг друга.*/
 (
 	id serial primary key,
-	cabin_id integer NOT NULL references cabins(id) ON DELETE CASCADE,
+	seat_id integer NOT NULL references seats(id) ON DELETE CASCADE,
 	ships_timetable_id integer NOT NULL references ships_timetable(id) ON DELETE CASCADE,
 	booked boolean NOT NULL DEFAULT false,
-	UNIQUE (cabin_id,ships_timetable_id)
+	UNIQUE (seat_id,ships_timetable_id)
 )
 WITH (
 	OIDS=FALSE
@@ -133,9 +144,11 @@ ALTER TABLE owners
 	OWNER TO rita;
 ALTER TABLE prices
 	OWNER TO rita;
+ALTER TABLE seats
+	OWNER TO rita;
 ALTER TABLE routes
 	OWNER TO rita;
-ALTER TABLE booked_cabins_for_timetable
+ALTER TABLE booked_seats_for_timetable
 	OWNER TO rita;
 	
 /*
@@ -151,14 +164,17 @@ ALTER TABLE booked_cabins_for_timetable
 ЗАМЕЧАНИЕ:  CREATE TABLE / UNIQUE создаст неявный индекс "cruiseships_name_key" для таблицы "cruiseships"
 ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "cabins_id_seq" для колонки serial "cabins.id"
 ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "cabins_pkey" для таблицы "cabins"
+ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "seats_id_seq" для колонки serial "seats.id"
+ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "seats_pkey" для таблицы "seats"
 ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "ships_timetable_id_seq" для колонки serial "ships_timetable.id"
 ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "ships_timetable_pkey" для таблицы "ships_timetable"
 ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "routes_id_seq" для колонки serial "routes.id"
 ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "routes_pkey" для таблицы "routes"
 ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "prices_id_seq" для колонки serial "prices.id"
 ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "prices_pkey" для таблицы "prices"
-ЗАМЕЧАНИЕ:  CREATE TABLE / UNIQUE создаст неявный индекс "prices_cabin_id_route_id_key" для таблицы "prices"
-ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "booked_cabins_for_timetable_id_seq" для колонки serial "booked_cabins_for_timetable.id"
-ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "booked_cabins_for_timetable_pkey" для таблицы "booked_cabins_for_timetable"
-ЗАМЕЧАНИЕ:  CREATE TABLE / UNIQUE создаст неявный индекс "booked_cabins_for_timetable_cabin_id_ships_timetable_id_key" для таблицы "booked_cabins_for_timetable"
+ЗАМЕЧАНИЕ:  CREATE TABLE / UNIQUE создаст неявный индекс "prices_seat_id_route_id_key" для таблицы "prices"
+ЗАМЕЧАНИЕ:  CREATE TABLE создаст последовательность "booked_seats_for_timetable_id_seq" для колонки serial "booked_seats_for_timetable.id"
+ЗАМЕЧАНИЕ:  CREATE TABLE / PRIMARY KEY создаст неявный индекс "booked_seats_for_timetable_pkey" для таблицы "booked_seats_for_timetable"
+ЗАМЕЧАНИЕ:  CREATE TABLE / UNIQUE создаст неявный индекс "booked_seats_for_timetable_seat_id_ships_timetable_id_key" для таблицы "booked_seats_for_timetable"
+Запрос успешно выполнен без возвращаемых данных за 876 мс.
 */
