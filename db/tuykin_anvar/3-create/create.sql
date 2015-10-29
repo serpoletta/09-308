@@ -17,6 +17,7 @@ CREATE TABLE students (
 	name VARCHAR NOT NULL,
 	surname VARCHAR NOT NULL,
 	birthday DATE,
+	phone VARCHAR(10) UNIQUE,
 	group_id INTEGER REFERENCES groups(id)
 );
 
