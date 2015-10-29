@@ -46,7 +46,8 @@ CREATE TABLE lessons_time (
     id serial PRIMARY KEY,
     starts_at TIME NOT NULL,
     ends_at TIME NOT NULL,
-    ordering SMALLINT
+    ordering SMALLINT,
+    CHECK (starts_at < ends_at)
 );
 
 CREATE TABLE lessons (
