@@ -109,3 +109,6 @@ WHERE owner_id=2;
 "  ->  Index Scan using cities_pkey on cities ci2  (cost=0.00..0.30 rows=1 width=208) (never executed)"
 "        Index Cond: (id = sh2.end_city_id)"
 "Total runtime: 0.187 ms"
+
+PS
+alter table ships_timetable add column start jsonb;
